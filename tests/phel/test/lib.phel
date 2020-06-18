@@ -6,10 +6,10 @@
   :successful 0
 })
 
-(defn assert [test expected got label]
+(defn assertStr [test testStr left right label]
   (do
     (update-in stats [:total] inc)
-    (if (test expected got)
+    (if (test left right)
       (do
         (update-in stats [:successful] inc)
         (print ".")
@@ -17,13 +17,16 @@
           (println)))
       (do
         (update-in stats [:failed] inc)
-        (php/print "\n")
-        (php/print label)
-        (php/print " - Expected: ")
-        (print expected)
-        (php/print ", Got: ")
-        (print got)
+        (print "\nError on \"")
+        (print label)
+        (print "\" - Expected: ")
+        (print right testStr left)
         (php/print "\n")))))
+
+(defmacro assert
+  [test left right label]
+  `(assertStr ,test ,(print-str test) ,left ,right ,label)
+)
 
 (defn print-summary []
   (do
